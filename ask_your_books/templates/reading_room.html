@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5eee4">
+    <title>Ask Your Books — The Reading Room</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='reading_room.css') }}">
+  </head>
+  <body>
+    <div class="page-frame">
+      <header class="masthead">
+        <a class="wordmark" href="{{ url_for('index') }}" aria-label="Ask Your Books home">
+          <span class="wordmark-seal">A<span>Y</span>B</span>
+          <span class="wordmark-name">Ask Your Books<small>A little reading room</small></span>
+        </a>
+        <nav class="top-nav" aria-label="Main navigation">
+          <a href="#the-shelf">The shelf</a>
+          <span class="nav-divider" aria-hidden="true">/</span>
+          <a href="#ask">Ask a question</a>
+          <span class="open-sign"><i></i> OPEN FOR READING</span>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-rule"></span> A PERSONAL LIBRARY, WITH GOOD MANNERS</p>
+            <h1 id="hero-title">A good book<br>always has <em>an answer.</em></h1>
+            <p class="hero-intro">Five old books, one very curious librarian. Ask about ancient myths, the stars, or anything tucked between these well-worn pages.</p>
+            <a class="hero-link" href="#ask">PULL UP A CHAIR <span aria-hidden="true">↓</span></a>
+          </div>
+
+          <div class="still-life" role="img" aria-label="An illustration of three vintage books on a table">
+            <div class="sun-disc"></div>
+            <div class="sparkle sparkle-one">✳</div>
+            <div class="sparkle sparkle-two">✦</div>
+            <div class="book-stack">
+              <div class="book book-back">
+                <span class="book-cap">AN OLD GUIDE TO</span>
+                <span class="book-title">THE<br>STARS</span>
+                <span class="book-flower">✳</span>
+                <span class="book-author">S E P H A R I A L</span>
+              </div>
+              <div class="book book-middle">
+                <span class="book-cap">STORIES OF</span>
+                <span class="book-title">GREEK<br>MYTH</span>
+                <span class="book-flower">✳</span>
+                <span class="book-author">THE OLD WORLD</span>
+              </div>
+              <div class="book book-front">
+                <span class="book-cap">A COMPANION TO</span>
+                <span class="book-title">THE<br>CLASSICS</span>
+                <span class="book-flower">❋</span>
+                <span class="book-author">EST. IN ANOTHER AGE</span>
+              </div>
+            </div>
+            <div class="table-line"></div>
+            <p class="still-life-caption">THE WELL-READ SHELF · EST. 1867</p>
+          </div>
+          <div class="hero-footnote"><span>VOL. I</span><span>MYTH · MYSTERY · THE CELESTIAL</span><span>NO. 005</span></div>
+        </section>
+
+        <section class="reading-grid">
+          <div class="ask-card" id="ask">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">YOUR QUESTION, PLEASE</p>
+                <h2>What would you like<br>to <em>look up?</em></h2>
+              </div>
+              <span class="index-stamp" aria-label="Reader's desk">READER'S<br>DESK</span>
+            </div>
+            <p class="ask-hint">The answer will come with its page number. We do like to show our work.</p>
+
+            <form action="{{ url_for('ask') }}" method="post" class="question-form">
+              <label for="question">Dear librarian,</label>
+              <textarea id="question" name="question" rows="3" maxlength="1000" required placeholder="Who helped Theseus find his way out of the Labyrinth?">{{ question }}</textarea>
+              <div class="form-footer">
+                <span class="form-note"><span class="tiny-star">✳</span> Answers are found in the books on this shelf.</span>
+                <button class="button button-primary" type="submit">TURN THE PAGE <span aria-hidden="true">↗</span></button>
+              </div>
+            </form>
+
+            <div class="try-these">
+              <span>IF YOU NEED A FIRST QUESTION</span>
+              <div class="prompt-list">
+                <button type="button" data-prompt="Who helped Theseus escape the Labyrinth?">Ariadne &amp; Theseus</button>
+                <button type="button" data-prompt="What physical traits does Sepharial associate with Mars?">Mars in old astrology</button>
+                <button type="button" data-prompt="What is the capital of Iceland?">A question not in these books</button>
+              </div>
+            </div>
+
+            {% if message %}
+              <div class="notice notice-{{ message_kind }}" role="status">{{ message }}</div>
+            {% endif %}
+
+            {% if answer %}
+              <article class="answer-card" aria-live="polite">
+                <div class="answer-topline"><span>FROM THE READING ROOM</span><span class="answer-star">✳</span></div>
+                <h3>Your answer</h3>
+                <p class="answer-text">{{ answer }}</p>
+                {% if citations %}
+                  <div class="source-heading">PAGES OPEN ON THE DESK</div>
+                  <ul class="source-list">
+                    {% for citation in citations %}
+                      <li><a href="{{ citation.url }}" target="_blank" rel="noopener">{{ citation.filename }}, p. {{ citation.page }} <span aria-hidden="true">↗</span></a></li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </article>
+            {% endif %}
+          </div>
+
+          <aside class="shelf-card" id="the-shelf">
+            <div class="shelf-heading">
+              <div>
+                <p class="eyebrow">CURRENTLY ON THE SHELF</p>
+                <h2>The little <em>collection</em></h2>
+              </div>
+              <span class="book-count">{{ "%02d"|format(books|length) }}</span>
+            </div>
+            <p class="shelf-intro">A small collection of public-domain books, ready when you are.</p>
+            {% if books %}
+              <ol class="book-list">
+                {% for book in books %}
+                  <li>
+                    <span class="book-number">{{ "%02d"|format(loop.index) }}</span>
+                    <a href="{{ url_for('book_pdf', filename=book.filename) }}" target="_blank" rel="noopener">{{ book.title }}<small>OPEN THE BOOK <span aria-hidden="true">↗</span></small></a>
+                  </li>
+                {% endfor %}
+              </ol>
+            {% else %}
+              <p class="empty-shelf">No books found yet. Add PDFs to your books folder.</p>
+            {% endif %}
+            <form action="{{ url_for('ingest') }}" method="post" class="index-form">
+              <p>New books, or a fresh start?</p>
+              <button class="button button-outline" type="submit">UPDATE THE CATALOG <span aria-hidden="true">↻</span></button>
+            </form>
+            <p class="shelf-note"><span>✳</span> Citations link to the page in the PDF edition on this shelf.</p>
+          </aside>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>ASK YOUR BOOKS <span aria-hidden="true">✳</span> A QUIETLY CURIOUS LITTLE PROJECT</span>
+        <span>THE BEST ANSWERS COME WITH A PAGE NUMBER.</span>
+      </footer>
+    </div>
+    <script>
+      document.querySelectorAll("[data-prompt]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const field = document.getElementById("question");
+          field.value = button.dataset.prompt;
+          field.focus();
+        });
+      });
+      document.querySelectorAll(".question-form").forEach((form) => {
+        form.addEventListener("submit", () => {
+          const button = form.querySelector("button");
+          button.disabled = true;
+          button.textContent = "FINDING THE PASSAGE…";
+        });
+      });
+      document.querySelectorAll(".index-form").forEach((form) => {
+        form.addEventListener("submit", () => {
+          const button = form.querySelector("button");
+          button.disabled = true;
+          button.textContent = "INDEXING THE SHELF…";
+        });
+      });
+    </script>
+  </body>
+</html>
