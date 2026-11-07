@@ -1,9 +1,10 @@
 # Ask-Your-Books
 
 A vintage-inspired web and command-line RAG application for asking questions
-about PDF books. It extracts text page by page, chunks it with overlap, embeds the chunks with
-Sentence Transformers, stores them in Chroma, and uses an LLM to answer with
-page-level citations. When retrieved passages do not appear relevant, it replies:
+about PDF books. It extracts text page by page, chunks it with overlap, embeds
+the chunks with Sentence Transformers, stores them in Chroma, and uses an LLM
+to answer with page-level citations. When retrieved passages do not appear
+relevant, it replies:
 
 > I don't know based on the provided documents.
 
@@ -16,7 +17,7 @@ page-level citations. When retrieved passages do not appear relevant, it replies
 ## Setup
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/Archee-Patel/ask-your-books.git
 cd ask-your-books
 python3 -m venv .venv
 source .venv/bin/activate
